@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
-from app.models import User
+from app.models import User, Subject, Quiz, Score  # Added missing imports
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import login_manager 
@@ -39,6 +39,7 @@ def register():
         return redirect(url_for('main.dashboard'))
         
     if request.method == 'POST':
+        full_name = request.form.get('full_name')  # Added this line
         email = request.form.get('email')
         username = request.form.get('username')
         password = request.form.get('password')
@@ -52,6 +53,7 @@ def register():
             return redirect(url_for('main.register'))
             
         new_user = User(
+            full_name=full_name,  # Added this
             email=email,
             username=username,
             password=generate_password_hash(password)
@@ -78,3 +80,21 @@ def dashboard():
 def logout():
     logout_user()
     return redirect(url_for('main.home'))
+
+@main.route('/subjects')
+@login_required
+def subjects():
+    subjects = Subject.query.all()
+    return render_template('subjects.html', subjects=subjects)
+
+@main.route('/quizzes')
+@login_required
+def quizzes():
+    quizzes = Quiz.query.all()
+    return render_template('quizzes.html', quizzes=quizzes)
+
+@main.route('/scores')
+@login_required
+def scores():
+    scores = Score.query.filter_by(user_id=current_user.id).all()
+    return render_template('scores.html', scores=scores)

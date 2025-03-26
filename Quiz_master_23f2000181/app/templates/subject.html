@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Subjects</h2>
+    <div class="list-group">
+        {% for subject in subjects %}
+        <a href="#" class="list-group-item list-group-item-action">
+            {{ subject.name }} - {{ subject.description }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

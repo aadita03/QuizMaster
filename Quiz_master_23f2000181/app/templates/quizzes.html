@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Quizzes</h2>
+    <div class="list-group">
+        {% for quiz in quizzes %}
+        <a href="#" class="list-group-item list-group-item-action">
+            Quiz #{{ quiz.id }} - Duration: {{ quiz.time_duration }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

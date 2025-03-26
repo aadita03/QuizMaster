@@ -35,21 +35,22 @@ def create_app():
             from app.models import User
             from werkzeug.security import generate_password_hash
             
-            # Check if users table exists first
-            if db.engine.has_table('user'):
-                if not User.query.filter_by(email='admin@quizmaster.com').first():
-                    admin_user = User(
-                        username='admin',
-                        email='admin@quizmaster.com',
-                        password=generate_password_hash('admin123'),
-                        full_name='Admin User',
-                        is_admin=True
-                    )
-                    db.session.add(admin_user)
-                    db.session.commit()
-                    print("Admin user created successfully!")
+            if not User.query.filter_by(email='admin@quizmaster.com').first():
+                admin_user = User(
+                    username='admin',
+                    email='admin@quizmaster.com',
+                    password=generate_password_hash('admin123'),
+                    full_name='Admin User',  # Required field
+                    qualification='Admin',   # Optional but good to set
+                    is_admin=True            # Critical for admin access
+                )
+                db.session.add(admin_user)
+                db.session.commit()
+                print("✅ Admin user created successfully!")
+            else:
+                print("ℹ️ Admin user already exists")
         except Exception as e:
-            print(f"Could not create admin user: {e}")
+            print(f"❌ Error creating admin user: {str(e)}")
             db.session.rollback()
     
     return app
