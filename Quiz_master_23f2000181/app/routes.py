@@ -3,11 +3,10 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app.models import User
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
-from app import login_manager  # Import login_manager from app
+from app import login_manager 
 
 main = Blueprint('main', __name__)
 
-# User loader function
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))

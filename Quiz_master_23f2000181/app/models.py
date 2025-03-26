@@ -9,6 +9,10 @@ class User(db.Model, UserMixin):
     full_name = db.Column(db.String(150))
     qualification = db.Column(db.String(100))
     dob = db.Column(db.Date)
+    is_admin = db.Column(db.Boolean, default=False)  # Add this line
+
+    def is_administrator(self):
+        return self.is_admin
 
 class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -25,7 +29,7 @@ class Quiz(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'))
     date_of_quiz = db.Column(db.DateTime)
-    time_duration = db.Column(db.String(10))  # Format HH:MM
+    time_duration = db.Column(db.String(10)) 
 
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,7 +39,7 @@ class Question(db.Model):
     option2 = db.Column(db.String(100), nullable=False)
     option3 = db.Column(db.String(100), nullable=False)
     option4 = db.Column(db.String(100), nullable=False)
-    correct_option = db.Column(db.Integer, nullable=False)  # 1, 2, 3, or 4
+    correct_option = db.Column(db.Integer, nullable=False)
 
 class Score(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
+import os
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -11,7 +12,7 @@ def create_app():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quizmaster.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = 'your-secret-key-here'  # Change this to a random secret key
+    app.config['SECRET_KEY'] = 'aadita03'  # In production, use a stronger key
     
     # Initialize extensions
     db.init_app(app)
@@ -20,11 +21,35 @@ def create_app():
     login_manager.login_view = 'main.login'
     
     with app.app_context():
-        # Import and register blueprints
+        # Register blueprints
         from app.routes import main
+        from app.admin import admin
         app.register_blueprint(main)
+        app.register_blueprint(admin, url_prefix='/admin')
         
-        # Create tables if they don't exist
+        # Create tables
         db.create_all()
+        
+        # Add admin user if not exists (safe version)
+        try:
+            from app.models import User
+            from werkzeug.security import generate_password_hash
+            
+            # Check if users table exists first
+            if db.engine.has_table('user'):
+                if not User.query.filter_by(email='admin@quizmaster.com').first():
+                    admin_user = User(
+                        username='admin',
+                        email='admin@quizmaster.com',
+                        password=generate_password_hash('admin123'),
+                        full_name='Admin User',
+                        is_admin=True
+                    )
+                    db.session.add(admin_user)
+                    db.session.commit()
+                    print("Admin user created successfully!")
+        except Exception as e:
+            print(f"Could not create admin user: {e}")
+            db.session.rollback()
     
     return app
