@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
-from app.models import User, Subject, Quiz, Score  # Added missing imports
-from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
-from app import login_manager 
+from app.models import User, Subject, Quiz, Score
+from app import db, login_manager
+import logging
 
 main = Blueprint('main', __name__)
 
@@ -21,16 +21,23 @@ def login():
         return redirect(url_for('main.dashboard'))
         
     if request.method == 'POST':
-        email = request.form.get('email')
+        email = request.form.get('email').strip()
         password = request.form.get('password')
+        
+        if not email or not password:
+            flash('Email and password are required', 'danger')
+            return redirect(url_for('main.login'))
+            
         user = User.query.filter_by(email=email).first()
         
         if user and check_password_hash(user.password, password):
             login_user(user)
             next_page = request.args.get('next')
+            flash('Login successful!', 'success')
             return redirect(next_page) if next_page else redirect(url_for('main.dashboard'))
         else:
             flash('Invalid email or password', 'danger')
+    
     return render_template('login.html')
 
 @main.route('/register', methods=['GET', 'POST'])
@@ -39,11 +46,16 @@ def register():
         return redirect(url_for('main.dashboard'))
         
     if request.method == 'POST':
-        full_name = request.form.get('full_name')  # Added this line
-        email = request.form.get('email')
-        username = request.form.get('username')
+        full_name = request.form.get('full_name', '').strip()
+        email = request.form.get('email', '').strip()
+        username = request.form.get('username', '').strip()
         password = request.form.get('password')
         
+        # Validation
+        if not all([full_name, email, username, password]):
+            flash('All fields are required', 'danger')
+            return redirect(url_for('main.register'))
+            
         if User.query.filter_by(email=email).first():
             flash('Email already registered', 'danger')
             return redirect(url_for('main.register'))
@@ -52,20 +64,21 @@ def register():
             flash('Username already taken', 'danger')
             return redirect(url_for('main.register'))
             
-        new_user = User(
-            full_name=full_name,  # Added this
-            email=email,
-            username=username,
-            password=generate_password_hash(password)
-        )
-        
         try:
+            new_user = User(
+                full_name=full_name,
+                email=email,
+                username=username,
+                password=generate_password_hash(password),
+                is_admin=False  # Explicitly set non-admin by default
+            )
             db.session.add(new_user)
             db.session.commit()
             flash('Registration successful! Please login.', 'success')
             return redirect(url_for('main.login'))
         except Exception as e:
             db.session.rollback()
+            logging.error(f"Registration error: {str(e)}")
             flash('Registration failed. Please try again.', 'danger')
             
     return render_template('register.html')

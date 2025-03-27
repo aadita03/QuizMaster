@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 import os
+from werkzeug.security import generate_password_hash
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -10,15 +11,17 @@ login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quizmaster.db'
+    # Improved configuration with environment variables
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///quizmaster.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = 'aadita03'  # In production, use a stronger key
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'aadita03'  # Better security
     
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
     login_manager.login_view = 'main.login'
+    login_manager.login_message_category = 'info'  # Added for better flash messages
     
     with app.app_context():
         # Register blueprints
@@ -30,27 +33,25 @@ def create_app():
         # Create tables
         db.create_all()
         
-        # Add admin user if not exists (safe version)
+        # Improved admin user creation
         try:
             from app.models import User
-            from werkzeug.security import generate_password_hash
+            admin_email = os.environ.get('ADMIN_EMAIL') or 'admin@quizmaster.com'
+            admin_password = os.environ.get('ADMIN_PASSWORD') or 'admin123'
             
-            if not User.query.filter_by(email='admin@quizmaster.com').first():
+            if not User.query.filter_by(email=admin_email).first():
                 admin_user = User(
                     username='admin',
-                    email='admin@quizmaster.com',
-                    password=generate_password_hash('admin123'),
-                    full_name='Admin User',  # Required field
-                    qualification='Admin',   # Optional but good to set
-                    is_admin=True            # Critical for admin access
+                    email=admin_email,
+                    password=generate_password_hash(admin_password),
+                    full_name='Admin User',
+                    is_admin=True  # Critical for admin access
                 )
                 db.session.add(admin_user)
                 db.session.commit()
-                print("✅ Admin user created successfully!")
-            else:
-                print("ℹ️ Admin user already exists")
+                app.logger.info("Admin user created successfully!")
         except Exception as e:
-            print(f"❌ Error creating admin user: {str(e)}")
+            app.logger.error(f"Error creating admin user: {str(e)}")
             db.session.rollback()
     
     return app
