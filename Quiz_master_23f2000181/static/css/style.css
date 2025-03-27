@@ -1,0 +1,73 @@
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Welcome Page */
+.welcome-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg,rgba(182, 7, 201, 0.45),rgb(154, 7, 234));
+    color: white;
+    text-align: center;
+}
+
+.welcome-container {
+    padding: 50px;
+    border-radius: 15px;
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1.2s ease-in-out;
+}
+
+.welcome-title span {
+    color:rgba(162, 0, 0, 0.87);
+    font-weight: bold;
+}
+
+.welcome-text {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.button-container .btn {
+    margin: 10px;
+}
+
+/* Login Page */
+.login-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.login-card {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
