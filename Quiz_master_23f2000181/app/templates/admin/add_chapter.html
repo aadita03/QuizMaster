@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Add Chapter{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Add New Chapter</h1>
+    
+    <form method="POST" action="{{ url_for('admin.add_chapter') }}">
+        <div class="mb-3">
+            <label for="subject_id" class="form-label">Subject</label>
+            <select class="form-select" id="subject_id" name="subject_id" required>
+                <option value="">Select Subject</option>
+                {% for subject in subjects %}
+                <option value="{{ subject.id }}">{{ subject.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="mb-3">
+            <label for="name" class="form-label">Chapter Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Add Chapter</button>
+        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

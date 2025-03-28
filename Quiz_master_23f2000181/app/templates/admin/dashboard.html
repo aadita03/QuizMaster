@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Admin Dashboard</h1>
+    
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Subjects</h5>
+                    <p class="card-text">Manage all subjects</p>
+                    <a href="{{ url_for('admin.add_subject') }}" class="btn btn-primary">Add Subject</a>
+                    <a href="{{ url_for('main.subjects') }}" class="btn btn-secondary mt-2">View All</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Chapters</h5>
+                    <p class="card-text">Manage chapters</p>
+                    <a href="{{ url_for('admin.add_chapter') }}" class="btn btn-primary">Add Chapter</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Quizzes</h5>
+                    <p class="card-text">Manage quizzes</p>
+                    <a href="{{ url_for('admin.upload_quiz') }}" class="btn btn-primary">Create Quiz</a>
+                    <a href="{{ url_for('admin.view_quizzes') }}" class="btn btn-secondary mt-2">View All</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Users</h5>
+                    <p class="card-text">Manage user accounts</p>
+                    <a href="{{ url_for('admin.manage_users') }}" class="btn btn-primary">Manage Users</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Scores</h5>
+                    <p class="card-text">View all scores</p>
+                    <a href="{{ url_for('admin.view_all_scores') }}" class="btn btn-primary">View All Scores</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -11,29 +11,28 @@ login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__)
-    # Improved configuration with environment variables
+    
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///quizmaster.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'aadita03'  # Better security
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'aadita03'  
     
-    # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
     login_manager.login_view = 'main.login'
-    login_manager.login_message_category = 'info'  # Added for better flash messages
+    login_manager.login_message_category = 'info' 
     
     with app.app_context():
-        # Register blueprints
+        
         from app.routes import main
         from app.admin import admin
         app.register_blueprint(main)
         app.register_blueprint(admin, url_prefix='/admin')
         
-        # Create tables
+        
         db.create_all()
         
-        # Improved admin user creation
+        
         try:
             from app.models import User
             admin_email = os.environ.get('ADMIN_EMAIL') or 'admin@quizmaster.com'
@@ -45,7 +44,7 @@ def create_app():
                     email=admin_email,
                     password=generate_password_hash(admin_password),
                     full_name='Admin User',
-                    is_admin=True  # Critical for admin access
+                    is_admin=True  
                 )
                 db.session.add(admin_user)
                 db.session.commit()

@@ -3,7 +3,10 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import User, Subject, Quiz, Score
 from app import db, login_manager
+from flask_login import current_user
 import logging
+from sqlalchemy.orm import joinedload  
+from app.models import Chapter
 
 main = Blueprint('main', __name__)
 
@@ -51,7 +54,6 @@ def register():
         username = request.form.get('username', '').strip()
         password = request.form.get('password')
         
-        # Validation
         if not all([full_name, email, username, password]):
             flash('All fields are required', 'danger')
             return redirect(url_for('main.register'))
@@ -70,7 +72,7 @@ def register():
                 email=email,
                 username=username,
                 password=generate_password_hash(password),
-                is_admin=False  # Explicitly set non-admin by default
+                is_admin=False  
             )
             db.session.add(new_user)
             db.session.commit()
@@ -86,6 +88,8 @@ def register():
 @main.route('/dashboard')
 @login_required
 def dashboard():
+    if current_user.is_administrator():
+        return redirect(url_for('admin.admin_dashboard'))
     return render_template('dashboard.html')
 
 @main.route('/logout')
@@ -103,11 +107,15 @@ def subjects():
 @main.route('/quizzes')
 @login_required
 def quizzes():
-    quizzes = Quiz.query.all()
+    quizzes = Quiz.query.options(
+        joinedload(Quiz.chapter).joinedload(Chapter.subject)
+    ).all()
     return render_template('quizzes.html', quizzes=quizzes)
 
 @main.route('/scores')
 @login_required
 def scores():
-    scores = Score.query.filter_by(user_id=current_user.id).all()
+    scores = Score.query.options(
+        joinedload(Score.quiz)
+    ).filter_by(user_id=current_user.id).all()
     return render_template('scores.html', scores=scores)

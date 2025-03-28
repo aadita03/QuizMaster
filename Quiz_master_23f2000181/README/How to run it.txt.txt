@@ -5,9 +5,13 @@
 	1.pip install flask flask-sqlalchemy flask-migrate flask-login werkzeug
 #Initialize the Database
 	1.flask db init
-	2.flask db migrate -m "Initial tables"
+	2.flask db migrate -m "Initial migration"
 	3.flask db upgrade
 #Run it
 	1. python run.py
 #Open browser and type this 
 	1.http://localhost:5000
+
+ADMIN INFO
+email - admin@quizmaster.com
+password - admin123

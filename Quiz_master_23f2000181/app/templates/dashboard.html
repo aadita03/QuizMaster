@@ -1,106 +1,39 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Quiz Master - Dashboard</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.dashboard') }}">Quiz Master</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    {% if current_user.is_administrator() %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('admin.upload_quiz') }}">Admin Panel</a>
-                    </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <span class="navbar-text me-3">Welcome, {{ current_user.username }}!</span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-light" href="{{ url_for('main.logout') }}">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+{% extends "base.html" %}
 
-    <div class="container mt-5">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Subjects</h5>
-                        <p class="card-text">Browse available subjects</p>
-                        <a href="{{ url_for('main.subjects') }}" class="btn btn-primary">View Subjects</a>
-                        {% if current_user.is_administrator() %}
-                        <a href="{{ url_for('admin.add_subject') }}" class="btn btn-success mt-2">Add Subject</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Quizzes</h5>
-                        <p class="card-text">Take available quizzes</p>
-                        <a href="{{ url_for('main.quizzes') }}" class="btn btn-primary">View Quizzes</a>
-                        {% if current_user.is_administrator() %}
-                        <a href="{{ url_for('admin.upload_quiz') }}" class="btn btn-success mt-2">Create Quiz</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Scores</h5>
-                        <p class="card-text">View your quiz scores</p>
-                        <a href="{{ url_for('main.scores') }}" class="btn btn-primary">View Scores</a>
-                        {% if current_user.is_administrator() %}
-                        <a href="{{ url_for('admin.view_all_scores') }}" class="btn btn-info mt-2">All Users' Scores</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {% if current_user.is_administrator() %}
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-warning text-dark">
-                        <h5>Admin Quick Actions</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-center gap-3">
-                            <a href="{{ url_for('admin.manage_users') }}" class="btn btn-outline-primary">Manage Users</a>
-                            <a href="{{ url_for('admin.add_chapter') }}" class="btn btn-outline-primary">Add Chapter</a>
-                            <a href="{{ url_for('admin.view_quizzes') }}" class="btn btn-outline-primary">Manage Quizzes</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-
+{% block content %}
+<div class="container mt-5">
+    <h2>Welcome to Your Dashboard, {{ current_user.username }}!</h2>
     
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <div class="row mt-4">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Subjects</h5>
+                    <p class="card-text">Browse available subjects</p>
+                    <a href="{{ url_for('main.subjects') }}" class="btn btn-primary">View Subjects</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Quizzes</h5>
+                    <p class="card-text">Take available quizzes</p>
+                    <a href="{{ url_for('main.quizzes') }}" class="btn btn-primary">View Quizzes</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Scores</h5>
+                    <p class="card-text">View your quiz scores</p>
+                    <a href="{{ url_for('main.scores') }}" class="btn btn-primary">View Scores</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

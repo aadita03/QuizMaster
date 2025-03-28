@@ -1,103 +1,116 @@
 {% extends "base.html" %}
 
+{% block title %}Upload Quiz{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <h2>Upload New Quiz</h2>
-    <form method="POST" id="quizForm">
-        <div class="mb-3">
-            <label class="form-label">Subject</label>
-            <select class="form-select" name="subject_id" id="subjectSelect" required>
-                <option value="">Select Subject</option>
-                {% for subject in subjects %}
-                <option value="{{ subject.id }}">{{ subject.name }}</option>
-                {% endfor %}
-            </select>
+<div class="container">
+    <h1 class="my-4">Create New Quiz</h1>
+    
+    <form method="POST" action="{{ url_for('admin.upload_quiz') }}">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="subject_id" class="form-label">Subject</label>
+                    <select class="form-select" id="subject_id" name="subject_id" required>
+                        <option value="">Select Subject</option>
+                        {% for subject in subjects %}
+                        <option value="{{ subject.id }}">{{ subject.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="chapter_id" class="form-label">Chapter</label>
+                    <select class="form-select" id="chapter_id" name="chapter_id" required>
+                        <option value="">Select Chapter</option>
+                        <!-- Chapters will be loaded via JavaScript -->
+                    </select>
+                </div>
+            </div>
         </div>
         
         <div class="mb-3">
-            <label class="form-label">Chapter</label>
-            <select class="form-select" name="chapter_id" id="chapterSelect" required disabled>
-                <option value="">Select Chapter</option>
-            </select>
+            <label for="quiz_name" class="form-label">Quiz Name</label>
+            <input type="text" class="form-control" id="quiz_name" name="quiz_name" required>
         </div>
         
         <div class="mb-3">
-            <label class="form-label">Time Duration (HH:MM)</label>
-            <input type="text" class="form-control" name="time_duration" required>
+            <label for="time_duration" class="form-label">Time Duration (minutes)</label>
+            <input type="number" class="form-control" id="time_duration" name="time_duration" min="1" required>
         </div>
         
-        <div id="questionsContainer">
-            <!-- Questions will be added here dynamically -->
-        </div>
+        <h4 class="mt-4">Questions</h4>
+        <div id="questions-container"></div>
         
-        <button type="button" class="btn btn-secondary mb-3" id="addQuestion">Add Question</button>
-        <input type="hidden" name="question_count" id="questionCount" value="0">
-        <button type="submit" class="btn btn-primary">Upload Quiz</button>
+        <button type="button" id="add-question" class="btn btn-secondary mb-4">Add Question</button>
+        <input type="hidden" id="question_count" name="question_count" value="0">
+        
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Save Quiz</button>
+            <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary">Cancel</a>
+        </div>
     </form>
 </div>
 
 <script>
-document.getElementById('subjectSelect').addEventListener('change', function() {
+document.getElementById('subject_id').addEventListener('change', function() {
     const subjectId = this.value;
-    const chapterSelect = document.getElementById('chapterSelect');
-    
-    if (subjectId) {
-        fetch(`/admin/get-chapters/${subjectId}`)
-            .then(response => response.json())
-            .then(data => {
-                chapterSelect.innerHTML = '<option value="">Select Chapter</option>';
-                data.chapters.forEach(chapter => {
-                    const option = document.createElement('option');
-                    option.value = chapter.id;
-                    option.textContent = chapter.name;
-                    chapterSelect.appendChild(option);
-                });
-                chapterSelect.disabled = false;
+    fetch(`/admin/get-chapters/${subjectId}`)
+        .then(response => response.json())
+        .then(data => {
+            const chapterSelect = document.getElementById('chapter_id');
+            chapterSelect.innerHTML = '<option value="">Select Chapter</option>';
+            data.chapters.forEach(chapter => {
+                const option = document.createElement('option');
+                option.value = chapter.id;
+                option.textContent = chapter.name;
+                chapterSelect.appendChild(option);
             });
-    } else {
-        chapterSelect.innerHTML = '<option value="">Select Chapter</option>';
-        chapterSelect.disabled = true;
-    }
+        });
 });
 
 let questionCount = 0;
-document.getElementById('addQuestion').addEventListener('click', function() {
+document.getElementById('add-question').addEventListener('click', function() {
     questionCount++;
-    document.getElementById('questionCount').value = questionCount;
+    document.getElementById('question_count').value = questionCount;
     
-    const container = document.getElementById('questionsContainer');
+    const container = document.getElementById('questions-container');
     const questionDiv = document.createElement('div');
     questionDiv.className = 'card mb-3';
     questionDiv.innerHTML = `
-        <div class="card-header">Question ${questionCount}</div>
         <div class="card-body">
+            <h5 class="card-title">Question ${questionCount}</h5>
             <div class="mb-3">
-                <label class="form-label">Question</label>
-                <input type="text" class="form-control" name="question_${questionCount}" required>
+                <label class="form-label">Question Statement</label>
+                <textarea class="form-control" name="question_${questionCount}" required></textarea>
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <input type="text" class="form-control mb-2" name="option1_${questionCount}" placeholder="Option 1" required>
+                    <div class="mb-3">
+                        <label class="form-label">Option 1</label>
+                        <input type="text" class="form-control" name="option1_${questionCount}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Option 2</label>
+                        <input type="text" class="form-control" name="option2_${questionCount}" required>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <input type="text" class="form-control mb-2" name="option2_${questionCount}" placeholder="Option 2" required>
-                </div>
-                <div class="col-md-6">
-                    <input type="text" class="form-control mb-2" name="option3_${questionCount}" placeholder="Option 3" required>
-                </div>
-                <div class="col-md-6">
-                    <input type="text" class="form-control mb-2" name="option4_${questionCount}" placeholder="Option 4" required>
+                    <div class="mb-3">
+                        <label class="form-label">Option 3</label>
+                        <input type="text" class="form-control" name="option3_${questionCount}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Option 4</label>
+                        <input type="text" class="form-control" name="option4_${questionCount}" required>
+                    </div>
                 </div>
             </div>
             <div class="mb-3">
-                <label class="form-label">Correct Option</label>
-                <select class="form-select" name="correct_${questionCount}" required>
-                    <option value="">Select Correct Option</option>
-                    <option value="1">Option 1</option>
-                    <option value="2">Option 2</option>
-                    <option value="3">Option 3</option>
-                    <option value="4">Option 4</option>
-                </select>
+                <label class="form-label">Correct Option (1-4)</label>
+                <input type="number" class="form-control" name="correct_${questionCount}" min="1" max="4" required>
             </div>
         </div>
     `;

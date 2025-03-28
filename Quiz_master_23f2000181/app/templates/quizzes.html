@@ -2,11 +2,16 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Quizzes</h2>
+    <h2>Available Quizzes</h2>
     <div class="list-group">
         {% for quiz in quizzes %}
         <a href="#" class="list-group-item list-group-item-action">
-            Quiz #{{ quiz.id }} - Duration: {{ quiz.time_duration }}
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ quiz.name }}</h5>
+                <small>{{ quiz.time_duration }} minutes</small>
+            </div>
+            <p class="mb-1">Chapter: {{ quiz.chapter.name }}</p>
+            <small>Subject: {{ quiz.chapter.subject.name }}</small>
         </a>
         {% endfor %}
     </div>
